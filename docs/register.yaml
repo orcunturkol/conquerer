@@ -1,0 +1,31 @@
+/api/users/register:
+  post:
+    tags:
+      - users
+    summary: Register a new user
+    description: Registers a new user with email, password, and fullname, and creates a unique username.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+              - fullname
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+                format: password
+              fullname:
+                type: string
+                description: Full name of the user
+    responses:
+      201:
+        description: User registered successfully
+      400:
+        description: Invalid input or user already exists

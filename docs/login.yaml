@@ -1,0 +1,29 @@
+/api/users/login:
+  post:
+    tags:
+      - users
+    summary: Log in a user
+    description: Allows users to log in by providing their email and password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+                format: password
+    responses:
+      200:
+        description: Successful login
+      400:
+        description: Invalid credentials
+      500:
+        description: Server error

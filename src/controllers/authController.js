@@ -1,15 +1,22 @@
 const bcrypt = require("bcrypt");
-const { createUser, findUserByEmail } = require("../models/userModels");
-const { generateToken, encryptToken } = require("../utils/jwtHelper");
-const pool = require("../config/dbConfig");
-
+const {
+  createUser,
+  findUserByEmail,
+  updateUser,
+  resetPassword,
+  findUserById,
+} = require("../models/userModels");
+const { updateSessionTimestamp } = require("../utils/jwtHelper");
+const sendResponse = require("../utils/responseUtil");
+const sendErrorResponse = require("../utils/errorResponseUtil");
+const { updateSessionIdentifier } = require("../utils/authHelper");
 const registerUser = async (req, res) => {
   const { email, password, fullname } = req.body;
   try {
     // Check if user already exists
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).send("User already exists");
+      sendErrorResponse(res, 400, "User already exists");
     }
 
     // Hash the password
@@ -19,20 +26,14 @@ const registerUser = async (req, res) => {
     const newUser = await createUser(email, hashedPassword, fullname);
 
     // Generate JWT token
-    const token = generateToken(newUser.id);
+    const token = await updateSessionIdentifier(newUser);
 
-    // Encrypt the token
-    const encryptedToken = await encryptToken(token);
-    // Save the active token in the database
-    await pool.query(
-      "INSERT INTO active_tokens (user_id, token) VALUES ($1, $2)",
-      [newUser.id, encryptedToken]
-    );
-
-    res.status(201).send({ userId: newUser.id, token });
+    await updateSessionTimestamp(newUser.id);
+    sendResponse(res, 201, true, "User created successfully", {
+      token,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Error in registration");
+    sendErrorResponse(res, 500, "An error occurred while registering user");
   }
 };
 
@@ -42,29 +43,68 @@ const loginUser = async (req, res) => {
     // Validate user's credentials
     const user = await findUserByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(400).send("Invalid credentials");
+      return sendErrorResponse(res, 400, "Invalid credentials");
     }
 
-    // Generate JWT token
-    const token = generateToken(user.id);
+    const token = await updateSessionIdentifier(user);
 
-    // Encrypt the token
-    const encryptedToken = await encryptToken(token);
-
-    // Save or update the active token in the database
-    await pool.query(
-      "INSERT INTO active_tokens (user_id, token) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET token = EXCLUDED.token",
-      [user.id, encryptedToken]
-    );
-
-    res.status(200).send({ userId: user.id, token });
+    return sendResponse(res, 200, true, "User logged in successfully", {
+      token,
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error in login");
+    return sendErrorResponse(
+      res,
+      500,
+      "An error occurred while logging in user"
+    );
+  }
+};
+
+const updateUserDetails = async (req, res) => {
+  const { userId } = req;
+  const { fullname, username, birthday } = req.body;
+
+  try {
+    await updateUser(userId, fullname, username, birthday);
+    sendResponse(res, 200, true, "User details updated successfully");
+  } catch (error) {
+    sendErrorResponse(
+      res,
+      500,
+      "An error occurred while updating user details"
+    );
+  }
+};
+
+const updatePassword = async (req, res) => {
+  const { userId } = req;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    // Validate user's credentials
+    const user = await findUserById(userId);
+    if (!user || !(await bcrypt.compare(oldPassword, user.password))) {
+      return sendErrorResponse(res, 400, "Invalid credentials");
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await resetPassword(userId, hashedPassword);
+    sendResponse(res, 200, true, "Password updated successfully");
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(
+      res,
+      500,
+      "An error occurred while updating password"
+    );
   }
 };
 
 module.exports = {
   registerUser,
   loginUser,
+  updateUserDetails,
+  updatePassword,
 };

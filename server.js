@@ -6,11 +6,13 @@ const userRoutes = require("./src/routes/userRoutes");
 const swaggerSpec = require("./src/swaggerConfig");
 const {
   createUsersTable,
-  createActiveTokensTable,
+  createSessionsTable,
+  createBlogsPostsTable,
 } = require("./src/config/dbSetup");
 
 createUsersTable()
-  .then(createActiveTokensTable)
+  .then(createSessionsTable)
+  .then(createBlogsPostsTable)
   .then(() => {
     const PORT = process.env.PORT || 3000;
     app.use(express.json());

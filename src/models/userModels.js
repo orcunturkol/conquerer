@@ -36,8 +36,44 @@ const findUserByUserName = async (username) => {
   return result.rows[0];
 };
 
+const updateUser = async (userId, fullname, username, birthday) => {
+  // SQL query to update user details
+  const query = `
+    UPDATE users 
+    SET fullname = $1, username = $2, birthday = $3
+    WHERE id = $4
+    RETURNING *;
+  `;
+  const values = [fullname, username, birthday, userId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+};
+
+const resetPassword = async (userId, password) => {
+  // SQL query to update user password
+  const query = `
+    UPDATE users 
+    SET password = $1
+    WHERE id = $2
+    RETURNING *;
+  `;
+  const values = [password, userId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+};
+
+const findUserById = async (userId) => {
+  const result = await pool.query("SELECT * FROM users WHERE id = $1", [
+    userId,
+  ]);
+  return result.rows[0];
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserByUserName,
+  updateUser,
+  resetPassword,
+  findUserById,
 };

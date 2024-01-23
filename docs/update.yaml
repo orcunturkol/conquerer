@@ -1,0 +1,78 @@
+/api/users/update:
+  put:
+    tags:
+      - users
+    summary: Update user information
+    description: Allows a user to update their fullname, username, and optionally, their birthday.
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              fullname:
+                type: string
+                description: The full name of the user, must be a string, contain at least 2 words, and be at least 4 characters.
+              username:
+                type: string
+                description: The new username for the user, must be a string and at least 4 characters.
+              birthday:
+                type: string
+                format: date
+                description: The user's birthday (optional), format YYYY-MM-DD.
+    responses:
+      200:
+        description: User information updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "User details updated successfully"
+      400:
+        description: Invalid input, such as incorrect fullname, username, or birthday format
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                message:
+                  type: string
+                  example: "Invalid input"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                message:
+                  type: string
+                  example: "Unauthorized"
+      500:
+        description: Server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                message:
+                  type: string
+                  example: "Server error"

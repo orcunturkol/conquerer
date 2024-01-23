@@ -1,29 +1,34 @@
-const { verifyToken, encryptToken } = require("../utils/jwtHelper");
+const { verifyToken } = require("../utils/jwtHelper");
+const pool = require("../config/dbConfig");
+const sendErrorResponse = require("../utils/errorResponseUtil");
 
 const authenticateToken = async (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
-    return res.status(401).send("No token provided");
+    sendErrorResponse(res, 401, "No token provided");
   }
 
   try {
     const decoded = verifyToken(token);
-    const encryptedToken = await encryptToken(token);
-
-    // Check if the token matches the encrypted token in the database
-    const result = await pool.query(
-      "SELECT * FROM active_tokens WHERE user_id = $1 AND token = $2",
-      [decoded.userId, encryptedToken]
+    // Check the token identifier against the sessions table
+    const sessionResult = await pool.query(
+      "SELECT token_identifier FROM sessions WHERE user_id = $1",
+      [decoded.userId]
     );
-    if (result.rows.length === 0) {
-      throw new Error("Token is not active");
+    if (
+      sessionResult.rows.length === 0 ||
+      sessionResult.rows[0].token_identifier !== decoded.tokenIdentifier
+    ) {
+      return sendErrorResponse(res, 403, "Invalid or expired token");
     }
 
+    // Continue with the request
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(403).send("Invalid or expired token");
+    console.log(error);
+    sendErrorResponse(res, 403, "Invalid or expired token");
   }
 };
 

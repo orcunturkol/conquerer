@@ -27,5 +27,22 @@
     responses:
       201:
         description: User registered successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "User created successfully"
+                data:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                      example: "your_jwt_token_here"
       400:
         description: Invalid input or user already exists

@@ -1,5 +1,6 @@
 const pool = require("./dbConfig");
 const logger = require("../utils/winstonLogger");
+const bcrypt = require("bcrypt");
 const createUsersTable = async () => {
   const queryText = `
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -82,10 +83,112 @@ const createCommentsTable = async () => {
     logger.error("Error creating comments table", error);
   }
 };
+const insertDummyUsers = async () => {
+  const usersData = [
+    {
+      email: "alice@example.com",
+      password: "password123!",
+      fullname: "Alice Johnson",
+      username: "alice2022",
+    },
+    {
+      email: "bob@example.com",
+      password: "password123!",
+      fullname: "Bob Smith",
+      username: "bobbyS",
+    },
+  ];
+  const userIds = [];
+
+  for (const userData of usersData) {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const insertUserQuery = `
+      INSERT INTO users (email, password, fullname, username)
+      VALUES ($1, $2, $3, $4) RETURNING id
+    `;
+    const result = await pool.query(insertUserQuery, [
+      userData.email,
+      hashedPassword,
+      userData.fullname,
+      userData.username,
+    ]);
+    userIds.push(result.rows[0].id);
+  }
+
+  logger.info("Dummy users inserted successfully");
+  return userIds;
+};
+
+const insertDummyBlogPosts = async (userIds) => {
+  const blogPosts = [
+    {
+      userId: userIds[0],
+      category: "Technology",
+      title: "Exploring Node.js",
+      content: "Node.js is a powerful JavaScript runtime...",
+    },
+    {
+      userId: userIds[1],
+      category: "Business",
+      title: "Starting a Startup",
+      content: "The journey of starting a new business...",
+    },
+  ];
+  const postIds = [];
+
+  for (const post of blogPosts) {
+    const insertPostQuery = `
+      INSERT INTO blog_posts (user_id, category, title, content)
+      VALUES ($1, $2, $3, $4) RETURNING id
+    `;
+    const result = await pool.query(insertPostQuery, [
+      post.userId,
+      post.category,
+      post.title,
+      post.content,
+    ]);
+    postIds.push(result.rows[0].id);
+  }
+
+  logger.info("Dummy blog posts inserted successfully");
+  return postIds;
+};
+
+const insertDummyComments = async (userIds, postIds) => {
+  const comments = [
+    {
+      userId: userIds[0],
+      postId: postIds[0],
+      content: "Great article on Node.js!",
+    },
+    {
+      userId: userIds[1],
+      postId: postIds[1],
+      content: "Very insightful, thanks for sharing.",
+    },
+  ];
+
+  for (const comment of comments) {
+    const insertCommentQuery = `
+      INSERT INTO comments (user_id, post_id, content)
+      VALUES ($1, $2, $3)
+    `;
+    await pool.query(insertCommentQuery, [
+      comment.userId,
+      comment.postId,
+      comment.content,
+    ]);
+  }
+
+  logger.info("Dummy comments inserted successfully");
+};
 
 module.exports = {
   createUsersTable,
   createSessionsTable,
   createBlogsPostsTable,
   createCommentsTable,
+  insertDummyUsers,
+  insertDummyBlogPosts,
+  insertDummyComments,
 };

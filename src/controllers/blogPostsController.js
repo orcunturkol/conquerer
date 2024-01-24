@@ -128,7 +128,6 @@ const getAllPosts = async (req, res) => {
       case FilterEnum.MY_COMMENTS:
         filterOption = "my_comments";
         const comments = await getCommentsByUserId(userId);
-        console.log(comments);
         return sendResponse(
           res,
           200,

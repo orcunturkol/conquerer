@@ -1,12 +1,12 @@
 const { verifyToken } = require("../utils/jwtHelper");
 const pool = require("../config/dbConfig");
 const sendErrorResponse = require("../utils/errorResponseUtil");
-
+const logger = require("../utils/winstonLogger");
 const authenticateToken = async (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
-    sendErrorResponse(res, 401, "No token provided");
+    return sendErrorResponse(res, 401, "No token provided");
   }
 
   try {
@@ -27,8 +27,8 @@ const authenticateToken = async (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    console.log(error);
-    sendErrorResponse(res, 403, "Invalid or expired token");
+    logger.error(error);
+    return sendErrorResponse(res, 403, "Invalid or expired token");
   }
 };
 

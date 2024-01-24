@@ -1,0 +1,47 @@
+/api/blogs:
+  get:
+    tags:
+      - blogs
+    summary: Retrieve all blog posts with optional filtering
+    description: Fetches all blog posts, optionally filtered by specific criteria like user's own posts, comments, latest posts, or a specific category.
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: filter
+        schema:
+          type: string
+          enum: [my_posts, my_comments, last_posts]
+        description: Filter to apply ('my_posts' for user's posts, 'my_comments' for user's comments on posts, 'last_posts' for latest posts)
+      - in: query
+        name: category
+        schema:
+          type: string
+          enum: [Business, Money, Technology, Artificial Intelligence]
+        description: Filter by specific category
+    responses:
+      200:
+        description: Blog posts retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  author:
+                    type: string
+                  comment_count:
+                    type: integer
+                  category:
+                    type: string
+      400:
+        description: Invalid input or filter criteria
+      401:
+        description: Unauthorized - User not logged in
+      500:
+        description: Internal server error

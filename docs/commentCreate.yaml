@@ -1,0 +1,49 @@
+/api/blogs/comment/{postId}:
+  post:
+    tags:
+      - blogs
+    summary: Create a comment on a blog post
+    description: Allows authenticated users to create a comment on a specific blog post.
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+        description: The unique id of the blog post to comment on
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - content
+            properties:
+              content:
+                type: string
+                description: The content of the comment
+    responses:
+      201:
+        description: Comment created successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "Comment created successfully"
+      400:
+        description: Invalid input, such as missing or invalid content
+      401:
+        description: Unauthorized - User not logged in
+      404:
+        description: Blog post not found
+      500:
+        description: Internal server error

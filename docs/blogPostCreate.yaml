@@ -1,0 +1,49 @@
+/api/blogs/create:
+  post:
+    tags:
+      - blogs
+    summary: Create a new blog post
+    description: Allows authenticated users to create a new blog post with a title, content, and category.
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - title
+              - content
+              - category
+            properties:
+              title:
+                type: string
+                description: The title of the blog post
+              content:
+                type: string
+                description: The content of the blog post
+              category:
+                type: string
+                enum: [Artificial Intelligence, Business, Money, Technology]
+                description: The category of the blog post
+    responses:
+      201:
+        description: Blog post created successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "Blog post created successfully"
+      400:
+        description: Invalid input, such as missing title, content, or invalid category
+      401:
+        description: Unauthorized - User not logged in
+      500:
+        description: Internal server error

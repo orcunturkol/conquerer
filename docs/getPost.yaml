@@ -1,0 +1,60 @@
+/api/blogs/{postId}:
+  get:
+    tags:
+      - blogs
+    summary: Retrieve a specific blog post
+    description: Fetches detailed information about a specific blog post, including its comments.
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+        description: The unique id of the blog post
+    responses:
+      200:
+        description: Blog post retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "Blog post retrieved successfully"
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: string
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    category:
+                      type: string
+                    comments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          content:
+                            type: string
+                          createdDate:
+                            type: string
+                            format: date-time
+                          userId:
+                            type: integer
+      404:
+        description: Blog post not found
+      500:
+        description: Internal server error

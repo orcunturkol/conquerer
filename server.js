@@ -15,6 +15,7 @@ const {
 } = require("./src/config/dbSetup");
 const blogRoutes = require("./src/routes/blogRoutes");
 const logger = require("./src/utils/winstonLogger");
+const elasticSearchRoutes = require("./src/routes/elasticSearchRoutes");
 
 createUsersTable()
   .then(createSessionsTable)
@@ -50,6 +51,7 @@ createUsersTable()
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     app.use("/api/users", userRoutes);
     app.use("/api/blogs", blogRoutes);
+    app.use("/api/elastic", elasticSearchRoutes);
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });

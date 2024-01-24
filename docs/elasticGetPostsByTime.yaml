@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  title: ElasticSearch Posts Data API
+  version: 1.0.0
+paths:
+  /api/elastic/posts-by-time:
+    get:
+      tags:
+        - ElasticSearch
+      summary: Get posts aggregated by time
+      description: >
+        Retrieves the distribution of blog posts over various time frames within a specified year.
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+          description: The date for which to retrieve post data, formatted as YYYY-MM-DD (e.g., 2021-01-01).
+      responses:
+        200:
+          description: Successfully fetched posts data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      this_week:
+                        type: object
+                        additionalProperties: 
+                          type: integer
+                        example:
+                          Artificial Intelligence: 2
+                          Money: 1
+                          Technology: 1
+                      this_month:
+                        type: object
+                        additionalProperties: 
+                          type: integer
+                        example:
+                          Artificial Intelligence: 8
+                          Technology: 6
+                          Money: 5
+                          Business: 4
+                      this_year:
+                        type: object
+                        additionalProperties: 
+                          type: integer
+                        example:
+                          Business: 80
+                          Money: 66
+                          Artificial Intelligence: 55
+                          Technology: 49
+        400:
+          description: Invalid request parameters
+        500:
+          description: Error occurred in fetching data

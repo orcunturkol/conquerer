@@ -1,0 +1,47 @@
+paths:
+  /api/elastic/category-rates:
+    get:
+      tags:
+        - ElasticSearch
+      summary: Get category rates from blog posts
+      description: >
+        Retrieves the percentage distribution of blog posts across different 
+        categories using Elasticsearch.
+      responses:
+        200:
+          description: Successfully fetched category rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          type: string
+                          example: "Technology"
+                        percentage:
+                          type: string
+                          example: "25.00"
+        500:
+          description: Error occurred in fetching data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Error fetching category rates"
+                  error:
+                    type: string
+                    example: "Internal server error"

@@ -10,6 +10,7 @@ const { updateSessionTimestamp } = require("../utils/jwtHelper");
 const sendResponse = require("../utils/responseUtil");
 const sendErrorResponse = require("../utils/errorResponseUtil");
 const { updateSessionIdentifier } = require("../utils/authHelper");
+const logger = require("../utils/winstonLogger");
 const registerUser = async (req, res) => {
   const { email, password, fullname } = req.body;
   try {
@@ -52,7 +53,7 @@ const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return sendErrorResponse(
       res,
       500,
@@ -93,7 +94,7 @@ const updatePassword = async (req, res) => {
     await resetPassword(userId, hashedPassword);
     sendResponse(res, 200, true, "Password updated successfully");
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return sendErrorResponse(
       res,
       500,

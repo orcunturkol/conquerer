@@ -1,0 +1,58 @@
+/api/blogs/update/{postId}:
+  put:
+    tags:
+      - blogs
+    summary: Update a blog post
+    description: Allows authenticated users to update an existing blog post.
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+        description: The unique id of the blog post to update
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - title
+              - content
+              - category
+            properties:
+              title:
+                type: string
+                description: The updated title of the blog post
+              content:
+                type: string
+                description: The updated content of the blog post
+              category:
+                type: string
+                enum: [Artificial Intelligence, Business, Money, Technology]
+                description: The updated category of the blog post
+    responses:
+      200:
+        description: Blog post updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "Blog post updated successfully"
+      400:
+        description: Invalid input, such as missing fields or invalid category
+      401:
+        description: Unauthorized - User not logged in or does not own the blog post
+      404:
+        description: Blog post not found
+      500:
+        description: Internal server error

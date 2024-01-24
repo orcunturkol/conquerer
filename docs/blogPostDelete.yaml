@@ -1,0 +1,24 @@
+/api/blogs/{postId}:
+  delete:
+    tags:
+      - blogs
+    summary: Soft delete a specific blog post
+    description: Marks a specific blog post and its associated comments as deleted without permanently removing them from the database.
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+        description: The unique id of the blog post to be soft deleted
+    responses:
+      200:
+        description: Blog post and associated comments marked as deleted successfully
+      401:
+        description: Unauthorized - User not logged in or does not have permission
+      404:
+        description: Blog post not found
+      500:
+        description: Internal server error

@@ -140,9 +140,109 @@ const validateUpdate = (req, res, next) => {
   next();
 };
 
+const validateBlogPost = (req, res, next) => {
+  const { title, content, category } = req.body;
+
+  // Title validation
+  if (!title || typeof title !== "string" || title.trim().length === 0) {
+    return sendErrorResponse(
+      res,
+      400,
+      "Title is required and must be a non-empty string"
+    );
+  }
+
+  // Content validation
+  if (!content || typeof content !== "string" || content.trim().length === 0) {
+    return sendErrorResponse(
+      res,
+      400,
+      "Content is required and must be a non-empty string"
+    );
+  }
+
+  // Category validation
+  const validCategories = [
+    "Artificial Intelligence",
+    "Business",
+    "Money",
+    "Technology",
+  ];
+  if (!validCategories.includes(category)) {
+    return sendErrorResponse(
+      res,
+      400,
+      `Category must be one of the following: ${validCategories.join(", ")}`
+    );
+  }
+
+  next();
+};
+
+const validateUpdateBlogPost = (req, res, next) => {
+  const { title, content, category } = req.body;
+
+  // Title validation
+  if (!title || typeof title !== "string" || title.trim().length === 0) {
+    return sendErrorResponse(
+      res,
+      400,
+      "Title is required and must be a non-empty string"
+    );
+  }
+
+  // Content validation
+  if (!content || typeof content !== "string" || content.trim().length === 0) {
+    return sendErrorResponse(
+      res,
+      400,
+      "Content is required and must be a non-empty string"
+    );
+  }
+
+  // Category validation
+  const validCategories = [
+    "Artificial Intelligence",
+    "Business",
+    "Money",
+    "Technology",
+  ];
+  if (!validCategories.includes(category)) {
+    return sendErrorResponse(
+      res,
+      400,
+      `Invalid category. Must be one of: ${validCategories.join(", ")}`
+    );
+  }
+
+  next();
+};
+
+const validateComment = (req, res, next) => {
+  const { content } = req.body;
+  const { postId } = req.params;
+
+  // Post ID validation
+  if (!postId || isNaN(postId)) {
+    return sendErrorResponse(res, 400, "Invalid post ID");
+  }
+
+  if (!content || typeof content !== "string" || content.trim().length === 0) {
+    return sendErrorResponse(
+      res,
+      400,
+      "Comment content is required and must be a non-empty string"
+    );
+  }
+  next();
+};
+
 module.exports = {
   validateRegistration,
   validateLogin,
   validateResetPassword,
   validateUpdate,
+  validateBlogPost,
+  validateUpdateBlogPost,
+  validateComment,
 };

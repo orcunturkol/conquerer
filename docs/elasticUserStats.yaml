@@ -1,0 +1,53 @@
+swagger: '2.0'
+info:
+  version: "1.0.0"
+  title: "User Stats API"
+  description: "API for getting statistics of users, including bloggers and readers."
+paths:
+  /api/elastic/user-stats:
+    get:
+      tags:
+        - ElasticSearch
+      summary: "Get User Statistics"
+      description: >
+        Retrieves statistics including the total number of users, 
+        number of users who are bloggers, and number of users who are readers.
+      responses:
+        200:
+          description: "Successfully fetched user statistics"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      totalUsers:
+                        type: integer
+                        example: 1000
+                      bloggers:
+                        type: integer
+                        example: 300
+                      readers:
+                        type: integer
+                        example: 700
+        500:
+          description: "Error occurred in fetching data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Error fetching user statistics"
+                  error:
+                    type: string
+                    example: "Internal server error"

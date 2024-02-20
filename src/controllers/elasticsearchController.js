@@ -4,7 +4,7 @@ const logger = require("../utils/winstonLogger");
 const getCategoryRates = async (req, res) => {
   try {
     const result = await elasticsearchClient.search({
-      index: "blogposts",
+      index: "posts",
       size: 0,
       aggs: {
         category_counts: {

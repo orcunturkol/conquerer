@@ -47,7 +47,7 @@ createUsersTable()
   .then(() => {
     const PORT = process.env.PORT || 3000;
     app.use(express.json());
-    // Swagger UI
+    // Swagger UI setup
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     app.use("/api/users", userRoutes);
     app.use("/api/blogs", blogRoutes);
